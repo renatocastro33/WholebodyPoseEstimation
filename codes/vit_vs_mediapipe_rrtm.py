@@ -28,6 +28,16 @@ import mediapipe
 import mediapipe as mp
 import time
 
+import sys
+import cv2
+import os
+
+
+module_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(1, os.path.join(module_path,'../src/'))
+from models.mediapipe.map_mp2coco import MP2COCO
+maper = MP2COCO()
+
 #############################################
 import cv2
 import onepose
@@ -157,7 +167,8 @@ while (True):
     hand_left_ids = [5,7,9,91]
     filter_ids(hand_left_ids,range(91,112),[9],"hand left",threshold=threshold)
             
-            
+    print(keypoints.shape)
+    print(scores.shape)
     frame_rrtm = draw_skeleton(frame_bgr, keypoints, scores, kpt_thr=threshold,line_width=2,radius=3)
     
 
