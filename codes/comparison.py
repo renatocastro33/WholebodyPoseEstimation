@@ -114,7 +114,6 @@ def process_keypoints(keypoints, keypoints_buffer, window_size=5):
 keypoints_buffer = []
 import copy
 
-cap = cv2.VideoCapture("input.mp4") 
 
 out = cv2.VideoWriter( 
     "output.avi", cv2.VideoWriter_fourcc(*'MPEG'), 30, (640*3,480)) 
