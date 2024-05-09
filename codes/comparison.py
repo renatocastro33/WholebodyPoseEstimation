@@ -63,7 +63,7 @@ handsModule   = mediapipe.solutions.hands
 filename = "/media/cristian/12FF1F6D0CD48422/Research/Gloss/Gloss/Datasets/PUCP/PruebasLSP/LSP-testeo 8 de marzo/cristian_lazo/guardar.webm"
 filename = "/media/cristian/12FF1F6D0CD48422/Research/Gloss/Gloss/Datasets/videos_largos_pucp/Gramática de la LSP： Morfología (4).mp4"
 
-filename = "/media/cristian/12FF1F6D0CD48422/Research/Gloss/Gloss/Datasets/PUCP/5. Segundo avance (corregido)/DINERO/DINERO_ORACION_2.mp4"
+filename = "/media/cristian/12FF1F6D0CD48422/Research/Gloss/Gloss/Datasets/PUCP/5. Segundo avance (corregido)/TELEFONO/TELEFONO_ORACION_2.mp4"
 capture = cv2.VideoCapture(filename)
 
 ## initialize pose estimator
@@ -125,7 +125,7 @@ height = 480#int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))  # float `height
 print("width :",width)
 print("height:",height)
 out = cv2.VideoWriter( 
-    "output.avi", cv2.VideoWriter_fourcc(*'MPEG'), 15, (width*2,height*2)) 
+    "../results/output_telefono_pucp.avi", cv2.VideoWriter_fourcc(*'MPEG'), 15, (width*2,height*2)) 
 
 cnt = 0
 def draw_text_with_background(frame, text, position, font, scale, text_color, background_color, thickness):
@@ -225,7 +225,7 @@ while (True):
     draw_text_with_background(frame_bgr, "ORIGINAL", (250, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), (0, 0, 0), 4)
     draw_text_with_background(frame, "MEDIAPIPE", (250, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 255), (0, 0, 0), 4)
     draw_text_with_background(frame_vit, "VITPOSE", (250, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 255), (0, 0, 0), 4)
-    draw_text_with_background(frame_rrtm_our, "OUR", (290, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 0), (0, 0, 0), 4)
+    draw_text_with_background(frame_rrtm_our, "OURS", (290, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 0), (0, 0, 0), 4)
 
     vis1 = np.concatenate((frame_bgr,frame), axis=1)
     vis2 = np.concatenate((frame_vit,frame_rrtm_our), axis=1)
