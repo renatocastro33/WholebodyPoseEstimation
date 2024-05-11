@@ -1,3 +1,4 @@
+from .map_mp2coco import MP2COCO
 from typing import List,Dict
 import mediapipe as mp
 import copy
@@ -32,7 +33,8 @@ default_draw_config = {
 
 class mediapipe_model:
     def __init__(self, models: List[str] = ['hands', 'face', 'pose'], image_mode: bool = True, 
-                 face_config: Dict = None, hands_config: Dict = None, pose_config: Dict = None) -> None:
+                 face_config: Dict = None, hands_config: Dict = None, pose_config: Dict = None,
+                 mode_coco : bool = False) -> None:
         """
         WholeBodyPoseEstimation using mediapipe
         Args:
@@ -41,6 +43,7 @@ class mediapipe_model:
             face_config (Dict): Configuration for the face model. Defaults to None
             hands_config (Dict): Configuration for the hands model. Defaults to None
             pose_config (Dict): Configuration for the pose model. Defaults to None
+            mode_coco (bool): Configuration of output format. mode_coco True returns 133 points in coco format
         """
         self.image_mode = image_mode
         # initialize drawing mediapipe
@@ -83,6 +86,8 @@ class mediapipe_model:
                                         min_detection_confidence=default_pose_config['min_detection_confidence'],
                                         min_tracking_confidence=default_pose_config['min_tracking_confidence'],
                                         model_complexity=default_pose_config['model_complexity'])
+        self.maper = MP2COCO()
+        self.mode_coco = mode_coco
 
     def predict(self,frame_rgb):
         results = {}
@@ -92,6 +97,10 @@ class mediapipe_model:
             results['hands']= self.hands_model.process(frame_rgb)
         if 'pose' in self.models:
             results['pose']= self.pose_model.process(frame_rgb)
+    
+        if self.mode_coco:
+            keypoints, scores = self.maper.process(frame_rgb,results)
+            return keypoints,scores
         return results
     
     def draw_mediapipe(self,frame_rgb,results: Dict,landmark_config:Dict=None,
