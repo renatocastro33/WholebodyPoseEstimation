@@ -1,3 +1,4 @@
+from .map_mp2coco import MP2COCO
 from typing import List,Dict
 import mediapipe as mp
 import copy
@@ -32,7 +33,8 @@ default_draw_config = {
 
 class mediapipe_model:
     def __init__(self, models: List[str] = ['hands', 'face', 'pose'], image_mode: bool = True, 
-                 face_config: Dict = None, hands_config: Dict = None, pose_config: Dict = None) -> None:
+                 face_config: Dict = None, hands_config: Dict = None, pose_config: Dict = None,
+                 mode_coco : bool = False,use_thresholding: bool=False,kpt_thr:float=0.5) -> None:
         """
         WholeBodyPoseEstimation using mediapipe
         Args:
@@ -41,7 +43,17 @@ class mediapipe_model:
             face_config (Dict): Configuration for the face model. Defaults to None
             hands_config (Dict): Configuration for the hands model. Defaults to None
             pose_config (Dict): Configuration for the pose model. Defaults to None
+            mode_coco (bool): Configuration of output format. mode_coco True returns 133 points in coco format
+            use_thresholding (bool): Configuration of thresholding.
+                ```
+                scores[scores>=self.kpt_thr]   = 1
+                scores[scores<self.kpt_thr]    = 0
+                keypoints[scores<self.kpt_thr] = 0
+                ```
+            kpt_thr (int): threshold to filtering
         """
+        self.kpt_thr = kpt_thr
+        self.use_thresholding = use_thresholding
         self.image_mode = image_mode
         # initialize drawing mediapipe
         self.mp_drawing = mp.solutions.drawing_utils
@@ -83,6 +95,8 @@ class mediapipe_model:
                                         min_detection_confidence=default_pose_config['min_detection_confidence'],
                                         min_tracking_confidence=default_pose_config['min_tracking_confidence'],
                                         model_complexity=default_pose_config['model_complexity'])
+        self.maper = MP2COCO()
+        self.mode_coco = mode_coco
 
     def predict(self,frame_rgb):
         results = {}
@@ -92,8 +106,20 @@ class mediapipe_model:
             results['hands']= self.hands_model.process(frame_rgb)
         if 'pose' in self.models:
             results['pose']= self.pose_model.process(frame_rgb)
+    
+        if self.mode_coco:
+            keypoints, scores = self.maper.process(frame_rgb,results)
+            if self.use_thresholding:
+                keypoints, scores = self.thresholding(keypoints,scores)
+            return keypoints,scores
         return results
     
+    def thresholding(self,keypoints,scores):
+        keypoints[scores<self.kpt_thr] = 0
+        scores[scores<self.kpt_thr]    = 0
+        scores[scores>=self.kpt_thr]   = 1
+        return keypoints,scores
+        
     def draw_mediapipe(self,frame_rgb,results: Dict,landmark_config:Dict=None,
                        connection_config:Dict=None):
 
