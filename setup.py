@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -11,7 +11,8 @@ setup(
     author_email='cristian2023ml@gmail.com',
     url='https://github.com/CristianLazoQuispe/WholebodyPoseEstimation',
     package_dir={'': 'src'},
-    packages=[''],
+    packages=find_packages(where='src'),
+    include_package_data=True,
     install_requires=requirements,
 )
 #pip install git+https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git
