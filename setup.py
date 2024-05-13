@@ -14,3 +14,5 @@ setup(
     packages=['wholebodypose'],
     install_requires=requirements,
 )
+#pip install git+https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git
+#pip install git+https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git@exp-cris
