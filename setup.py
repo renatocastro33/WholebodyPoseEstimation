@@ -11,7 +11,7 @@ setup(
     author_email='cristian2023ml@gmail.com',
     url='https://github.com/CristianLazoQuispe/WholebodyPoseEstimation',
     package_dir={'': 'src'},
-    packages=['wholebodypose'],
+    packages=[''],
     install_requires=requirements,
 )
 #pip install git+https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git
