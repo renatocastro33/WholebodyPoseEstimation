@@ -34,10 +34,10 @@ if __name__ == "__main__":
         collate_fn_final = collate_fn_gcnbert
         model = GCN_BERT(num_classes=100, hidden_features=2, seq_len=50, num_joints=135,nhead=5)
     elif args.model_name == "spoter":
-        model = SPOTER(num_classes=100, hidden_dim=270, num_heads=9, num_layers_1=3, num_layers_2=3,
+        model = SPOTER(num_classes=100, hidden_dim=270, num_heads=3, num_layers_1=3, num_layers_2=3,
                      dim_feedforward_encoder=64, dim_feedforward_decoder=64, dropout=0.3, norm_first=True, batch_first=True)
     elif args.model_name == "silt":
-        model = SILT(num_classes=100, hidden_dim=270, num_heads=9, num_layers_1=3, num_layers_2=3,
+        model = SILT(num_classes=100, hidden_dim=270, num_heads=3, num_layers_1=3, num_layers_2=3,
                      dim_feedforward_encoder=64, dim_feedforward_decoder=64, dropout=0.3, norm_first=True, batch_first=True)
     elif args.model_name == "pose_tgcn":
         model = PoseGTCN(input_feature=100, num_joints=135, hidden_feature=200, num_class=100, p_dropout=0.3, num_stage=20, is_resi=True)
@@ -61,8 +61,8 @@ if __name__ == "__main__":
     training_pipeline(args,model,train_loader, val_loader, test_loader, device)
 
     #python training_pipeline.py --train --model_name="gcn_bert" --epochs=2000 --best_model_path="../../results/models/gcn_bert/wlasl_bestv2.pth" --patience=500 --device="cuda:3"
-    #python training_pipeline.py --train --model_name="spoter" --epochs=2000 --best_model_path="../../results/models/spoter/wlasl_best.pth"
-    #python training_pipeline.py --train --model_name="silt" --epochs=2000 --best_model_path="../../results/models/silt/wlasl_best.pth" --device="cuda:5"    
-    #python training_pipeline.py --train --model_name="pose_tgcn" --epochs=2000 --best_model_path="../../results/models/pose_tgcn/wlasl_best.pth" --device="cuda:4"    
+    #python training_pipeline.py --train --model_name="spoter" --epochs=2000 --best_model_path="../../results/models/spoter/wlasl_best.pth"  --patience=500
+    #python training_pipeline.py --train --model_name="silt" --epochs=2000 --best_model_path="../../results/models/silt/wlasl_best.pth" --device="cuda:5"  --patience=500   
+    #python training_pipeline.py --train --model_name="pose_tgcn" --epochs=2000 --best_model_path="../../results/models/pose_tgcn/wlasl_best.pth" --device="cuda:4"  --patience=500
 
     

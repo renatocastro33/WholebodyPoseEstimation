@@ -20,6 +20,8 @@ import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import accuracy_score, top_k_accuracy_score
 from collections import defaultdict
+import torch.nn.utils as nn_utils
+
 
 
 
@@ -27,7 +29,7 @@ from collections import defaultdict
 def training_pipeline(args,model,train_loader, val_loader, test_loader, device):
 
     # === Optimizer
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
     criterion = nn.CrossEntropyLoss()
 
     # === Configuración
@@ -52,6 +54,8 @@ def training_pipeline(args,model,train_loader, val_loader, test_loader, device):
                 out = model(x, mask)
                 loss = criterion(out, y)
                 loss.backward()
+                # Clip gradients: prevent exploding gradients
+                nn_utils.clip_grad_norm_(model.parameters(), max_norm=0.5)
                 optimizer.step()
 
                 train_loss += loss.item()
