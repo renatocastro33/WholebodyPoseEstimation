@@ -16,4 +16,6 @@ def collate_fn(batch):
     keypoints, names, labels, _ = zip(*batch)  # each keypoint: [T, 135, 2]
     keypoints, padding_mask = apply_padding(list(keypoints))  # [B, T, 270], [B, T]
     labels = torch.tensor(labels, dtype=torch.long)
+    #padding_mask = torch.tensor(padding_mask, dtype=torch.bool)
+    padding_mask = padding_mask.clone().detach().to(dtype=torch.bool)
     return keypoints, labels, padding_mask, names
