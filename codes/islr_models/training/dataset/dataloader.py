@@ -30,8 +30,8 @@ class SimpleHDF5Dataset(Dataset):
         data = torch.tensor(entry["data"][()], dtype=torch.float32).permute(0, 2, 1)-0.5  # [T, V, 2]
 
         if random.random() < 0.5:
-            data += (torch.randn_like(data)*self.noise_std) if self.augmentation else 0
             if self.transform:
+                data += (torch.randn_like(data)*self.noise_std)
                 n_spatial_func  = len(self.transform.spatial_augmentations.keys())
                 data = self.transform.apply_spatial(random.randint(0, n_spatial_func - 1),data)
 

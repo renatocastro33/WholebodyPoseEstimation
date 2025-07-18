@@ -105,8 +105,8 @@ class PoseGTCN(nn.Module):
         for i in range(num_stage):
             self.gcbs.append(GC_Block(hidden_feature,num_joints, p_dropout=p_dropout, is_resi=is_resi))
 
-        self.gcbs = nn.ModuleList(self.gcbs)
-        self.do = nn.Dropout(p_dropout)
+        self.gcbs  = nn.ModuleList(self.gcbs)
+        self.do    = nn.Dropout(p_dropout)
         self.act_f = nn.Tanh()
 
         self.fc_out = nn.Linear(hidden_feature, num_class)

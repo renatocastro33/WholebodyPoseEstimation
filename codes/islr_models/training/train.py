@@ -49,7 +49,7 @@ def training_pipeline(args,model,train_loader, val_loader, test_loader, device):
 
             loop = tqdm(train_loader, total=len(train_loader), ncols=100, desc=f"Epoch {epoch+1}/{EPOCHS} [Train]")
             for x, y, mask, _ in loop:
-                x, y, mask = x.to(device), y.to(device), mask.to(device)
+                x, y, mask = x.to(device), y.to(device), mask.to(device, dtype=torch.bool)
                 optimizer.zero_grad()
                 out = model(x, mask)
                 loss = criterion(out, y)
@@ -71,7 +71,7 @@ def training_pipeline(args,model,train_loader, val_loader, test_loader, device):
             with torch.no_grad():
                 val_loop = tqdm(val_loader, total=len(val_loader), ncols=100, desc=f"Epoch {epoch+1}/{EPOCHS} [Val  ]")
                 for x, y, mask, _ in val_loop:
-                    x, y, mask = x.to(device), y.to(device), mask.to(device)
+                    x, y, mask = x.to(device), y.to(device), mask.to(device, dtype=torch.bool)
                     out = model(x, mask)
                     loss = criterion(out, y)
 
@@ -107,7 +107,7 @@ def training_pipeline(args,model,train_loader, val_loader, test_loader, device):
     with torch.no_grad():
         test_loop = tqdm(test_loader, total=len(test_loader), ncols=100, desc="[TEST]")
         for x, y, mask, names in test_loop:
-            x, y, mask = x.to(device), y.to(device), mask.to(device)
+            x, y, mask = x.to(device), y.to(device), mask.to(device, dtype=torch.bool)
             out = model(x, mask)
             loss = criterion(out, y)
 
