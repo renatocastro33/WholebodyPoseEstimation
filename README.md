@@ -151,7 +151,7 @@ Standardized preprocessing yields consistent improvements across all models and 
 
 <p align="center">
   <img src="results/gifs/sample_accident.gif" width="480"><br>
-  <em>Example of real-time multi-person keypoint tracking and filtering.</em>
+  <em>Example of real-time person keypoint tracking and filtering.</em>
 </p>
 
 ---
