@@ -12,7 +12,7 @@
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repo-black?logo=github&style=flat-square)](https://github.com/CristianLazoQuispe/WholebodyPoseEstimation)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&style=flat-square)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](./LICENSE)
-
+[![Project Website](https://img.shields.io/badge/Website-Visit-blueviolet?style=flat-square&logo=google-chrome)](https://cristianlazoquispe.github.io/wholebodypose.github.io/)
 </div>
 
 ---
