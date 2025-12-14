@@ -10,6 +10,7 @@ License: MIT
 
 import os
 import sys
+import math
 import shutil
 import subprocess
 import json
@@ -61,7 +62,7 @@ DEFAULT_FPS = 15
 DEFAULT_LINE_WIDTH = 2
 DEFAULT_RADIUS = 1
 DEFAULT_KPT_THRESHOLD = 0.5
-VIDEO_CODEC_MP4 = 'mp4v'
+VIDEO_CODEC_MP4 = 'avc1'#'mp4v'
 MIN_MODE_COUNT = 4
 MODE_TOLERANCE = 1.05
 LOWER_THRESHOLD_RATIO = 0.75
@@ -420,7 +421,7 @@ class Video2Pose:
         Returns:
             Tuple of (width, height) after rotation
         """
-        ret, frame = vid.read()
+        ret, frame = vid.read(cv2.CAP_DSHOW)
         if not ret or frame is None:
             raise ValueError("Failed to read first frame from video")
         
@@ -434,7 +435,9 @@ class Video2Pose:
         filepath: str, 
         folder_results: str, 
         width: int, 
-        height: int
+        height: int,
+        fps: int = DEFAULT_FPS,
+
     ) -> Tuple[cv2.VideoWriter, str]:
         """
         Initialize video writer for output.
@@ -454,13 +457,41 @@ class Video2Pose:
             f"{filename_base}_{self.model_name}.mp4"
         )
         
-        writer = cv2.VideoWriter(
-            output_path,
-            cv2.VideoWriter_fourcc(*VIDEO_CODEC_MP4),
-            DEFAULT_FPS,
-            (width, height)
-        )
+        #writer = cv2.VideoWriter(
+        #    output_path,
+        #    cv2.VideoWriter_fourcc(*VIDEO_CODEC_MP4),
+        #    DEFAULT_FPS,
+        #    (width, height)
+        #)
+
+
+        # Try web-compatible codecs
+        web_codecs = [
+            ('avc1', 'H.264 (avc1)'),
+            ('H264', 'H.264 (H264)'),
+            ('X264', 'H.264 (X264)'),
+            ('MJPG', 'Motion JPEG'),  # Web-compatible fallback
+        ]
         
+        writer = None
+        codec_used = None
+        
+        for codec, name in web_codecs:
+            test_writer = cv2.VideoWriter(
+                output_path,
+                cv2.VideoWriter_fourcc(*codec),
+                fps,
+                (width, height)
+            )
+            
+            if test_writer.isOpened():
+                writer = test_writer
+                codec_used = codec
+                print(f"[INFO] Using {name} codec")
+                break
+            else:
+                test_writer.release()        
+
         return writer, output_path
     
     def reencode_video_for_web(
@@ -494,7 +525,10 @@ class Video2Pose:
         line_width: int = DEFAULT_LINE_WIDTH,
         radius: int = DEFAULT_RADIUS,
         save_as_mov: bool = False,
-        background_plot: Optional[str] = None
+        background_plot: Optional[str] = None,
+        multiperson: bool = False,
+        video_processing_fps: int = None,
+        output_video_fps: int = DEFAULT_FPS
     ) -> Dict:
         """
         Run pose estimation on a video file.
@@ -535,17 +569,34 @@ class Video2Pose:
         background_color = self.video_processor.get_background_color(background_plot)
         
         vid, results = self._initialize_video_capture(filepath)
+        original_fps = results['fps']
         
+        if video_processing_fps is None:
+            video_processing_fps = original_fps
+
+        if output_video_fps is None:
+            output_video_fps = original_fps
+
+
+        frame_skip = max(1, math.ceil(original_fps / video_processing_fps))
+        print(f"[INFO] Original          FPS: {original_fps}")
+        print(f"Processing every {frame_skip} frame(s)")
+        print(f"[INFO] Target processing FPS: {video_processing_fps}")
+        print(f"[INFO] Output video      FPS: {output_video_fps}")
+
         width, height = self._get_rotated_frame_dimensions(vid, rotation)
         results['width'] = width
         results['height'] = height
         
+        #set fps of video to default fps
+        vid.set(cv2.CAP_PROP_FPS, DEFAULT_FPS)
+        #
         vid.set(cv2.CAP_PROP_POS_FRAMES, 0)
         
         writer = None
         if folder_results:
             writer, output_path = self._initialize_video_writer(
-                filepath, folder_results, width, height
+                filepath, folder_results, width, height, output_video_fps
             )
             results['filepath_result'] = output_path
         
@@ -555,13 +606,17 @@ class Video2Pose:
         keypoints_list = []
         scores_list = []
         frame_count = 0
-        
+        processed_count = 0
+
         while True:
             ret, frame = vid.read()
             
             if not ret or frame is None:
                 break
             
+            if frame_count % frame_skip != 0:
+                frame_count += 1
+                continue            
             frame = self.video_processor.rotate_frame(frame, rotation)
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
@@ -572,18 +627,22 @@ class Video2Pose:
                     background_color, width, height
                 )
             
-            person_idx = self.person_selector.select_largest_person(keypoints, scores)
-            keypoints_list.append(keypoints[person_idx, :, :])
-            scores_list.append(scores[person_idx, :])
+            if not multiperson:
+                person_idx = self.person_selector.select_largest_person(keypoints, scores)
+                keypoints = keypoints[person_idx, :, :]
+                scores = scores[person_idx, :]
+
+            keypoints_list.append(keypoints)
+            scores_list.append(scores)
             
-            keypoints[person_idx, :, :] = self.keypoint_cleaner.clean_outliers(
-                keypoints[person_idx, :, :]
-            )
+            for idx in range(keypoints.shape[0]):
+                keypoints[idx, :, :] = self.keypoint_cleaner.clean_outliers(
+                    keypoints[idx, :, :])
             
             frame = self.draw_skeleton(
                 frame,
-                np.array([keypoints[person_idx, :, :]]),
-                scores,
+                np.array(keypoints) if multiperson else np.array([keypoints]),
+                np.array(scores) if multiperson else np.array([scores]),
                 kpt_thr=DEFAULT_KPT_THRESHOLD,
                 line_width=line_width,
                 radius=radius
@@ -598,6 +657,10 @@ class Video2Pose:
                 writer.write(frame)
             
             frame_count += 1
+            processed_count += 1
+        
+        print(f"[INFO] Processed {processed_count}/{frame_count} frames")
+        
         
         vid.release()
         if writer is not None:
@@ -605,12 +668,12 @@ class Video2Pose:
         if show:
             cv2.destroyAllWindows()
         
-        results['n_frames'] = frame_count
-        results['total_keypoints'] = np.array(keypoints_list)
-        results['total_scores'] = np.array(scores_list)
-        
+        results['n_frames'] = processed_count
+        results['total_keypoints'] = keypoints_list
+        results['total_scores']    = scores_list
+                
         if folder_results and writer is not None:
-            success, web_path = self.reencode_video_for_web(output_path, folder_results)
+            success, web_path = True,output_path #self.reencode_video_for_web(output_path, folder_results)
             if success:
                 results['filepath_result'] = web_path
             
