@@ -110,7 +110,7 @@ jupyter notebook codes/rtmpose/inference_webcam.ipynb
 
 ### Option 1: Install as Package (Recommended)
 
-**Basic installation:**
+**Basic installation:** 
 ```bash
 pip install git+https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git
 ```
