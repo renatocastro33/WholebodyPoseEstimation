@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wholebodypose"
+version = "0.1.0"
+description = "Whole body pose estimation with 133 keypoints"
+readme = "README.md"
+requires-python = ">=3.10,<3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Cristian Lazo Quispe", email = "cristian2023ml@gmail.com"}
+]
+keywords = ["pose estimation", "computer vision", "mediapipe", "whole body pose"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+
+dependencies = [
+    "mediapipe>=0.10.11,<0.11",
+    "opencv-python>=4.6.0.66,<5.0",
+    "onnxruntime-gpu>=1.17.1,<1.20",
+    "rtmlib>=0.0.11,<0.1",
+    "torch>=2.0.0,<2.3",
+    "onepose @ git+https://github.com/developer0hye/onepose.git@dcb645fb52d2f3055dff893965d484e20b917c0f",
+    "numpy>=1.23.4,<1.27",
+]
+
+[project.optional-dependencies]
+video = ["ffmpeg-python>=0.2.0"]
+dev = [
+    "pytest>=7.0",
+    "black>=22.0",
+    "flake8>=5.0",
+    "mypy>=0.990",
+]
+all = [
+    "ffmpeg-python>=0.2.0",
+    "pytest>=7.0",
+    "black>=22.0",
+    "flake8>=5.0",
+    "mypy>=0.990",
+]
+
+[project.urls]
+Homepage = "https://github.com/CristianLazoQuispe/WholebodyPoseEstimation"
+Repository = "https://github.com/CristianLazoQuispe/WholebodyPoseEstimation"
+Issues = "https://github.com/CristianLazoQuispe/WholebodyPoseEstimation/issues"
+Documentation = "https://github.com/CristianLazoQuispe/WholebodyPoseEstimation#readme"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+wholebodypose = ["*.json", "*.yaml", "*.yml"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
