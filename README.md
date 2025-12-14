@@ -55,9 +55,10 @@ WholebodyPoseEstimation/
 │   └── comparison.py                    # Cross-model evaluation
 ├── src/wholebodypose/
 │   ├── models/                          # Unified model wrappers
-│   ├── filters/                         # Real-time filtering (NLMS, mean)
+│   ├── filters/                         # Sequence filtering
 │   ├── enhancing/                       # Illumination correction
 │   └── utils/                           # COCO133 utils, visualization
+│   └── video/                           # Video pose estimation
 ├── docker/                              # Dockerfiles & compose setups
 ├── data/                                # Example images/videos & metadata
 ├── results/                             # Demo outputs (GIFs, filtered poses)
