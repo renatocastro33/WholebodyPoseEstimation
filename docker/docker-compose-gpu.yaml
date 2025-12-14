@@ -1,0 +1,29 @@
+services:
+  wholebody-pose-gpu:
+    build:
+      context: ..                       # build context is the parent directory
+      dockerfile: docker/Dockerfile.gpu
+    image: wholebody-pose-gpu          # name of the image
+    container_name: wholebody-pose-gpu # name of the container
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+        limits:
+          memory: 16g
+          cpus: '8.0'
+    volumes:
+      - ../:/workspace
+    ports:
+      - "8888:8888"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - DISPLAY=host.docker.internal:0.0
+    stdin_open: true
+    tty: true
+
+# from root of the project:
+#docker compose -f docker/docker-compose-gpu.yaml up --build
