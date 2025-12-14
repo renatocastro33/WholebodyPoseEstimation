@@ -94,7 +94,7 @@ def reencode_for_web(
             "Install with: pip install wholebodypose[video]"
         )
     
-    from ..utils.files import create_directory
+    from wholebodypose.utils.files import create_directory
     
     input_file = Path(input_path)
     output_dir = Path(output_folder)
