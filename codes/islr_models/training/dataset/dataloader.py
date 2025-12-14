@@ -40,9 +40,11 @@ class SimpleHDF5Dataset(Dataset):
         key = self.keys[idx]
         entry = self.h5file[key]
         data = entry["data"][()]
-        data = entry["score"][()]
-        if self.filter is not None:
-            data = self.filter.apply(data)
+        # if score exists, use it to filter the data
+        if "score" in entry:
+            score = entry["score"][()]
+            if self.filter is not None:
+                data = self.filter.apply(data,score)
         data = torch.tensor(data, dtype=torch.float32).permute(0, 2, 1)-0.5  # [T, V, 2]
 
         if random.random() < 0.5:
