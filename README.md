@@ -8,7 +8,7 @@
 
 <div align="center">
 
-[![Dataset](https://img.shields.io/badge/Dataset-HuggingFace-blue?logo=huggingface&style=flat-square)](https://huggingface.co/datasets/CristianLazoQuispe/ISLR_pose_datasets)
+[![Dataset](https://img.shields.io/badge/Dataset-HuggingFace-blue?logo=huggingface&style=flat-square)](https://huggingface.co/datasets/CristianLazoQuispe/pose-action-recognition)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repo-black?logo=github&style=flat-square)](https://github.com/CristianLazoQuispe/WholebodyPoseEstimation)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&style=flat-square)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](./LICENSE)
@@ -68,57 +68,92 @@ WholebodyPoseEstimation/
 
 ---
 
+## ⚡ Quick Start
+
+### Using the Package API
+```python
+from wholebodypose.models.rtmpose import RTMPoseModel
+from wholebodypose.video import Video2Pose
+import cv2
+
+# Single image inference
+model = RTMPoseModel(device='cuda')
+image = cv2.imread('person.jpg')
+keypoints, scores = model.predict(image)  # Returns COCO-133 format
+
+# Video processing
+video_processor = Video2Pose(model_name='rtmpose')
+results = video_processor.predict(
+    'input_video.mp4',
+    folder_results='output/',
+    save_as_mov=True  # Requires [video] extra
+)
+
+print(f"Processed {results['n_frames']} frames")
+print(f"Keypoints shape: {results['total_keypoints'].shape}")  # [T, 133, 2]
+```
+
+### Using Jupyter Notebooks
+
+For interactive exploration and visualization:
+```bash
+# Image inference
+jupyter notebook codes/rtmpose/inference_image.ipynb
+
+# Webcam inference
+jupyter notebook codes/rtmpose/inference_webcam.ipynb
+```
+---
+
 ## 🚀 Installation
 
-### 1. Clone the repository
+### Option 1: Install as Package (Recommended)
+
+**Basic installation:**
+```bash
+pip install git+https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git
+```
+
+**With video conversion support** (includes ffmpeg-python for MP4/MOV conversion):
+```bash
+pip install "git+https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git#egg=wholebodypose[video]"
+```
+
+**For development:**
 ```bash
 git clone https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git
 cd WholebodyPoseEstimation
-````
+pip install -e ".[video]"  # Editable install with video extras
+```
 
-### 2. Install dependencies
+### Option 2: Manual Setup
 
+**1. Clone the repository:**
+```bash
+git clone https://github.com/CristianLazoQuispe/WholebodyPoseEstimation.git
+cd WholebodyPoseEstimation
+```
+
+**2. Install dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. (Optional) Docker setup
+### 3. (Optional) Docker Setup
 
-**CPU**
-
+**CPU:**
 ```bash
 docker compose -f docker/docker-compose-cpu.yaml up
 ```
 
-**GPU**
-
+**GPU:**
 ```bash
 docker compose -f docker/docker-compose-gpu.yaml up
 ```
 
 ---
 
-## 🧩 Usage
-
-### ▶️ 1. Image or Video Inference
-
-```bash
-python -m src.wholebodypose.models.mediapipe.model --source path/to/video.mp4
-```
-
-or run:
-
-```bash
-jupyter notebook codes/mediapipe/inference_image.ipynb
-```
-
-### 🎥 2. Real-Time Webcam Inference with Filtering
-
-```bash
-jupyter notebook codes/filtering/inference_webcam_filters.ipynb
-```
-
-### 📚 3. Train Sign Language Recognition Models
+## 📚 Train Sign Language Recognition Models
 
 Available training pipelines:
 
